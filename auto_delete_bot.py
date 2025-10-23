@@ -33,7 +33,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = await update.message.reply_text(
         "📘 *Auto Delete Bot — Command List*\n\n"
-        "⏱️ */settime <minutes>* — Set delete delay\n"
+        ""⏱️ */settime minutes* — Set delete delay\n"
         "📊 */status* — Show current delete delay\n"
         "🧹 */clean* — Delete last messages\n"
         "ℹ️ */help* — Show this help menu\n\n"
