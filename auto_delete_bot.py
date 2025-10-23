@@ -12,37 +12,47 @@ async def delete_later(msg, delay):
     await asyncio.sleep(delay)
     try:
         await msg.delete()
+import asyncio
+import os
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
+
+TOKEN = os.getenv("BOT_TOKEN")
+DEFAULT_DELETE_TIME = 30
+delete_times = {}
+
+async def delete_later(msg, delay):
+    await asyncio.sleep(delay)
+    try:
+        await msg.delete()
     except:
         pass
 
-# Start command
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
     delete_time = delete_times.get(chat_id, DEFAULT_DELETE_TIME)
     minutes = delete_time // 60
     msg = await update.message.reply_text(
-        f"🤖 *Auto Delete Bot is Active!*\n\n"
-        f"⏳ Messages will be deleted automatically after *{minutes} minute(s).* \n"
-        f"🧑‍💼 Only *group admins* can change settings.\n"
-        f"💡 Use */help* for all commands.",
-        parse_mode="MarkdownV2"
+        f"🤖 <b>Auto Delete Bot is Active!</b>\n\n"
+        f"⏳ Messages will be deleted automatically after <b>{minutes}</b> minute(s).\n"
+        f"🧑‍💼 Only <b>group admins</b> can change settings.\n"
+        f"💡 Use <code>/help</code> for all commands.",
+        parse_mode="HTML"
     )
     asyncio.create_task(delete_later(msg, 20))
 
-# Help command
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = await update.message.reply_text(
-        "📘 *Auto Delete Bot — Command List*\n\n"
-        ""⏱️ */settime minutes* — Set delete delay\n"
-        "📊 */status* — Show current delete delay\n"
-        "🧹 */clean* — Delete last messages\n"
-        "ℹ️ */help* — Show this help menu\n\n"
+        "📘 <b>Auto Delete Bot — Command List</b>\n\n"
+        "⏱️ <code>/settime &lt;minutes&gt;</code> — Set delete delay\n"
+        "📊 <code>/status</code> — Show current delete delay\n"
+        "🧹 <code>/clean</code> — Delete last messages\n"
+        "ℹ️ <code>/help</code> — Show this help menu\n\n"
         "⚠️ Only admins can manage bot settings.",
-        parse_mode="MarkdownV2"
+        parse_mode="HTML"
     )
     asyncio.create_task(delete_later(msg, 25))
 
-# Settime command (minutes)
 async def settime(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
@@ -50,16 +60,16 @@ async def settime(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if member.status not in ("administrator", "creator"):
         msg = await update.message.reply_text(
-            "🚫 *Access Denied\\!* Only *admins* can use */settime*",
-            parse_mode="MarkdownV2"
+            "🚫 <b>Access Denied!</b> Only admins can use <code>/settime</code>",
+            parse_mode="HTML"
         )
         asyncio.create_task(delete_later(msg, 10))
         return
 
     if not context.args:
         msg = await update.message.reply_text(
-            "⚙️ Usage: */settime 10m*\n⏳ Example: */settime 5m* — deletes every 5 minutes",
-            parse_mode="MarkdownV2"
+            "⚙️ Usage: <code>/settime 10m</code><br>⏳ Example: <code>/settime 5m</code> — deletes every 5 minutes",
+            parse_mode="HTML"
         )
         asyncio.create_task(delete_later(msg, 15))
         return
@@ -75,18 +85,17 @@ async def settime(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         delete_times[chat.id] = seconds
         msg = await update.message.reply_text(
-            f"✅ Auto delete time set to *{minutes} minute(s)* for this chat\\.",
-            parse_mode="MarkdownV2"
+            f"✅ Auto delete time set to <b>{minutes}</b> minute(s) for this chat.",
+            parse_mode="HTML"
         )
         asyncio.create_task(delete_later(msg, 10))
     except ValueError:
         msg = await update.message.reply_text(
-            "⚠️ Invalid format\\! Use */settime 5m*",
-            parse_mode="MarkdownV2"
+            "⚠️ Invalid format! Use <code>/settime 5m</code>",
+            parse_mode="HTML"
         )
         asyncio.create_task(delete_later(msg, 10))
 
-# Status command
 async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
@@ -94,8 +103,8 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if member.status not in ("administrator", "creator"):
         msg = await update.message.reply_text(
-            "⚠️ You must be an *admin* to check status\\.",
-            parse_mode="MarkdownV2"
+            "⚠️ You must be an <b>admin</b> to check status.",
+            parse_mode="HTML"
         )
         asyncio.create_task(delete_later(msg, 10))
         return
@@ -103,12 +112,11 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     delay = delete_times.get(chat.id, DEFAULT_DELETE_TIME)
     minutes = delay // 60
     msg = await update.message.reply_text(
-        f"📊 *Current delete delay:* {minutes} minute(s)",
-        parse_mode="MarkdownV2"
+        f"📊 <b>Current delete delay:</b> {minutes} minute(s)",
+        parse_mode="HTML"
     )
     asyncio.create_task(delete_later(msg, 20))
 
-# Clean command
 async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
@@ -116,18 +124,17 @@ async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if member.status not in ("administrator", "creator"):
         msg = await update.message.reply_text(
-            "🚫 *Access Denied\\!* Only admins can use */clean*",
-            parse_mode="MarkdownV2"
+            "🚫 <b>Access Denied!</b> Only admins can use <code>/clean</code>",
+            parse_mode="HTML"
         )
         asyncio.create_task(delete_later(msg, 10))
         return
 
-    msg = await update.message.reply_text("🧹 Cleaning recent messages...", parse_mode="MarkdownV2")
+    msg = await update.message.reply_text("🧹 Cleaning recent messages...", parse_mode="HTML")
     await asyncio.sleep(2)
-    await msg.edit_text("✅ *Clean completed\\!*", parse_mode="MarkdownV2")
+    await msg.edit_text("✅ <b>Clean completed!</b>", parse_mode="HTML")
     asyncio.create_task(delete_later(msg, 10))
 
-# Auto delete all messages (including bots)
 async def auto_delete(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message:
         chat_id = update.effective_chat.id
@@ -138,7 +145,6 @@ async def auto_delete(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except:
             pass
 
-# Run bot
 app = ApplicationBuilder().token(TOKEN).build()
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("help", help_command))
@@ -147,5 +153,5 @@ app.add_handler(CommandHandler("status", status))
 app.add_handler(CommandHandler("clean", clean))
 app.add_handler(MessageHandler(filters.ALL & ~filters.StatusUpdate.ALL, auto_delete))
 
-print("🚀 Auto Delete Bot Pro (MarkdownV2) Running...")
+print("🚀 Auto Delete Bot Pro (HTML mode) Running...")
 app.run_polling()
