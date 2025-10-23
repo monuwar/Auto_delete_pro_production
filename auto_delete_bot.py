@@ -1,18 +1,5 @@
-import asyncio
-import os
-from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
-
-TOKEN = os.getenv("BOT_TOKEN")
-DEFAULT_DELETE_TIME = 30  # default 30s
-delete_times = {}
-
-# Helper: safe delete
-async def delete_later(msg, delay):
-    await asyncio.sleep(delay)
-    try:
-        await msg.delete()
-import asyncio
+# -*- coding: utf-8 -*-
+asyncio
 import os
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
@@ -60,7 +47,7 @@ async def settime(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if member.status not in ("administrator", "creator"):
         msg = await update.message.reply_text(
-            "🚫 <b>Access Denied!</b> Only admins can use <code>/settime</code>",
+            "🚫 <b>Access Denied!</b> Only admins can use <code>/settime</code>.",
             parse_mode="HTML"
         )
         asyncio.create_task(delete_later(msg, 10))
@@ -68,7 +55,7 @@ async def settime(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not context.args:
         msg = await update.message.reply_text(
-            "⚙️ Usage: <code>/settime 10m</code><br>⏳ Example: <code>/settime 5m</code> — deletes every 5 minutes",
+            "⚙️ Usage: <code>/settime 10m</code><br>Example: <code>/settime 5m</code> — deletes every 5 minutes.",
             parse_mode="HTML"
         )
         asyncio.create_task(delete_later(msg, 15))
@@ -124,7 +111,7 @@ async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if member.status not in ("administrator", "creator"):
         msg = await update.message.reply_text(
-            "🚫 <b>Access Denied!</b> Only admins can use <code>/clean</code>",
+            "🚫 <b>Access Denied!</b> Only admins can use <code>/clean</code>.",
             parse_mode="HTML"
         )
         asyncio.create_task(delete_later(msg, 10))
